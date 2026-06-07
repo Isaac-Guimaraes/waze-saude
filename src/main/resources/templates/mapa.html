@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Waze da Saúde - Mapa</title>
+    <style>
+
+        :root {
+            --theme-dark: #261654;       /* Roxo */
+            --theme-accent: #c036c8;     /* Magenta */
+            --theme-accent-hover: #9d29a3; /* Magenta Escuro */
+            --theme-white: #ffffff;
+            --bg-page: #f5f3f9;          /* Cinza bem claro  */
+            --text-dark: #2d3748;
+            --text-gray: #718096;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-page);
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .main-header {
+            background-color: var(--theme-dark);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+
+        .header-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-title {
+            color: var(--theme-white);
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+        .header-subtitle {
+            color: #bfaee3; /* Roxo claro */
+            font-size: 14px;
+            display: block;
+            margin-top: 4px;
+            text-align: left;
+        }
+
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-greeting {
+            color: var(--theme-white);
+            font-size: 15px;
+        }
+        .btn-logout {
+            background-color: transparent;
+            color: var(--theme-white);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-logout:hover {
+            background-color: var(--theme-accent);
+            border-color: var(--theme-accent);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: var(--theme-white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .page-title {
+            color: var(--theme-dark);
+            margin-top: 0;
+            font-size: 22px;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+        .hospital-list { list-style-type: none; padding: 0; margin: 0; }
+        .hospital-item {
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        .hospital-item:hover {
+            box-shadow: 0 8px 16px rgba(38, 22, 84, 0.1);
+            border-color: var(--theme-accent);
+            transform: translateY(-2px);
+        }
+        .hospital-info { display: flex; justify-content: space-between; align-items: flex-start; }
+        .hospital-text strong { font-size: 18px; color: var(--theme-dark); font-weight: 800;}
+        .hospital-text small {
+            color: var(--text-gray); display: block; margin: 6px 0 12px 0; font-size: 14px;
+        }
+
+        .distancia-tag {
+            display: inline-block;
+            background: #f3effa;
+            color: var(--theme-dark);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .ocupacao {
+            font-weight: bold; padding: 6px 12px; border-radius: 6px;
+            background-color: #fed7d7; color: #c53030; font-size: 14px; text-align: center; min-width: 120px;
+        }
+        .ocupacao.vazio { background-color: #c6f6d5; color: #276749; }
+
+        .botoes-acao {
+            display: flex; gap: 12px; margin-top: 15px; border-top: 1px solid #edf2f7; padding-top: 20px;
+        }
+
+        .btn-rota, .btn-checkin, .btn-checkout, .btn-disabled {
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .btn-rota {
+            background-color: var(--theme-dark);
+            color: var(--theme-white);
+            border: 2px solid var(--theme-dark);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-rota:hover {
+            background-color: #170d33;
+            border-color: #170d33;
+        }
+
+        .btn-checkin {
+            background-color: var(--theme-accent);
+            color: var(--theme-white);
+            border: 2px solid var(--theme-accent);
+            width: 100%;
+        }
+        .btn-checkin:hover {
+            background-color: var(--theme-accent-hover);
+            border-color: var(--theme-accent-hover);
+        }
+
+        .btn-checkout {
+            background-color: transparent; color: #c53030; border: 2px solid #c53030; width: 100%;
+        }
+        .btn-checkout:hover { background-color: #c53030; color: white; }
+
+        .btn-disabled {
+            background-color: #edf2f7; color: #a0aec0; border: 2px solid #edf2f7; cursor: not-allowed;
+        }
+
+        form { flex: 1; margin: 0; display: flex; }
+    </style>
+</head>
+<body>
+<header class="main-header">
+    <div class="header-brand">
+        <h1 class="header-title">Waze da Saúde</h1>
+        <span class="header-subtitle">Sistema de Roteamento Inteligente</span>
+    </div>
+
+    <div class="user-panel">
+        <span class="user-greeting">Olá, <strong th:text="${usuario.nome}">Paciente</strong></span>
+        <form th:action="@{/logout}" method="post" style="flex: none;">
+            <button type="submit" class="btn-logout">Sair</button>
+        </form>
+    </div>
+</header>
+
+<div class="container">
+    <h2 class="page-title">Painel de Unidades</h2>
+    <p style="color: var(--text-gray); margin-bottom: 24px;">Unidades com atendimento disponível perto de você:</p>
+
+    <ul class="hospital-list">
+        <li class="hospital-item" th:each="unidade : ${unidades}">
+            <div class="hospital-info">
+                <div class="hospital-text">
+                    <strong th:text="${unidade.nome}">Nome do Hospital</strong>
+                    <small th:text="${unidade.endereco}">Endereço</small>
+
+                    <span class="distancia-tag">
+                            📍 <span th:text="${#numbers.formatDecimal(unidade.distanciaAtual, 1, 1)}">0.0</span> Km de você
+                        </span>
+                </div>
+
+                <div class="ocupacao"
+                     th:classappend="${(unidade.ocupacaoAtual * 100 / unidade.capacidadeMaxima) < 50} ? 'vazio' : ''"
+                     th:text="'Ocupação: ' + ${unidade.ocupacaoAtual} + ' / ' + ${unidade.capacidadeMaxima}">
+                </div>
+            </div>
+
+            <div class="botoes-acao">
+                <a th:href="'https://www.google.com/maps/dir/?api=1&destination=' + ${unidade.nome} + ' Salvador'" target="_blank" class="btn-rota">Traçar Rota</a>
+
+                <form th:if="${!temFichaAberta}" th:action="@{/checkin/{id}(id=${unidade.idUnidade})}" method="post">
+                    <button type="submit" class="btn-checkin">Check-in</button>
+                </form>
+
+                <form th:if="${temFichaAberta and unidadeAtualId == unidade.idUnidade}" th:action="@{/checkout/{id}(id=${unidade.idUnidade})}" method="post">
+                    <button type="submit" class="btn-checkout">Check-out</button>
+                </form>
+
+                <button th:if="${temFichaAberta and unidadeAtualId != unidade.idUnidade}" class="btn-disabled" disabled title="Finalize seu atendimento atual primeiro.">Bloqueado</button>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
